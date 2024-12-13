@@ -15,8 +15,8 @@ class Player(pygame.sprite.Sprite):
         self.player_pos_y_change = 0
         self.is_jumping = False
         self.jumps_left = 2  # Nombre de sauts (double saut inclus)
-        self.gravity = 1.2  # Gravité
-        self.jump_speed = -22  # Vitesse du saut
+        self.gravity = 1  # Gravité
+        self.jump_speed = -18  # Vitesse du saut
 
         # Dash
         self.is_dashing = False
@@ -30,8 +30,8 @@ class Player(pygame.sprite.Sprite):
         
         # Vélocité
         self.max_speed = 10  # Vitesse maximale
-        self.acceleration = 0.4  # Accélération
-        self.deceleration = 0.4  # Décélération douce
+        self.acceleration = 0.7  # Accélération
+        self.deceleration = 0.01  # Décélération douce
         self.current_speed = 0  # Vitesse actuelle
     
 

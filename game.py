@@ -1,5 +1,4 @@
 import pygame
-from menu import Menu
 from player import Player
 from enemy import Enemy
 from piece import Piece
@@ -80,7 +79,6 @@ class Game:
         self.started = True
         self.clock = pygame.time.Clock()  # Pour contrôler la vitesse de la boucle
         
-        self.menu = Menu(self.screen)
         
     def load_best_score(self):
         """Charge le meilleur score depuis un fichier."""
@@ -237,138 +235,136 @@ class Game:
             self.animate_death()
     def run(self):
         while self.started:
-            action = self.menu.run()
-            if action == "start_game":
-                if not self.alive:
-                    return  # Si le joueur est mort, sortir de la boucle
+            if not self.alive:
+                return  # Si le joueur est mort, sortir de la boucle
 
-                # Afficher l'image du joueur
-                self.screen.blit(self.background, (self.x_offset, self.y_offset))
-                self.screen.blit(self.plateformimg, (0, 0))
-                
-                    # Dessiner les plateformes
-                self.player.update(self.plateformes)
-                
-                for plateforme in self.plateformes:
-                    # Dessine la plateforme avec un décalage de 5 pixels vers le bas
-                    plateforme_visuelle = pygame.Rect(
-                        plateforme.x, 
-                        plateforme.y + 5,  # Décalage de 5 pixels vers le bas
-                        plateforme.width, 
-                        plateforme.height
-                    )
-                    # ------------- ici ------------------
-                    #pygame.draw.rect(self.screen, (255, 255, 255), plateforme_visuelle)
+            # Afficher l'image du joueur
+            self.screen.blit(self.background, (self.x_offset, self.y_offset))
+            self.screen.blit(self.plateformimg, (0, 0))
             
-                if not self.pieces and pygame.time.get_ticks() - self.last_piece_spawn_time > self.piece_spawn_interval:
-                    x, y = Piece.generate_random_position(self.screen.get_width(), self.screen.get_height(), self.floor)
-                    new_piece = Piece(x, y)
-                    self.pieces.append(new_piece)  # Ajouter la pièce à la liste
-                    self.last_piece_spawn_time = pygame.time.get_ticks()  # Réinitialiser le timer
-                
-                for piece in self.pieces[:]:
-                    piece.update()
-                    self.screen.blit(piece.image, piece.rect)
-                    if self.player.rect.colliderect(piece.rect):  # Collision avec une pièce
-                        self.pieces.remove(piece)
-                        self.score += 1
-                        
-                        
-                if  pygame.time.get_ticks() - self.last_heart_spawn_time > self.heart_spawn_interval:
-                    x, y = Heart.generate_random_position(self.screen.get_width(), self.screen.get_height(), self.floor)
-                    new_heart = Heart(x, y)
-                    self.hearts.append(new_heart)
-                    print(self.last_heart_spawn_time)
-                    self.last_heart_spawn_time = pygame.time.get_ticks()
+                # Dessiner les plateformes
+            self.player.update(self.plateformes)
+            
+            for plateforme in self.plateformes:
+                # Dessine la plateforme avec un décalage de 5 pixels vers le bas
+                plateforme_visuelle = pygame.Rect(
+                    plateforme.x, 
+                    plateforme.y + 5,  # Décalage de 5 pixels vers le bas
+                    plateforme.width, 
+                    plateforme.height
+                )
+                # ------------- ici ------------------
+                #pygame.draw.rect(self.screen, (255, 255, 255), plateforme_visuelle)
+        
+            if not self.pieces and pygame.time.get_ticks() - self.last_piece_spawn_time > self.piece_spawn_interval:
+                x, y = Piece.generate_random_position(self.screen.get_width(), self.screen.get_height(), self.floor)
+                new_piece = Piece(x, y)
+                self.pieces.append(new_piece)  # Ajouter la pièce à la liste
+                self.last_piece_spawn_time = pygame.time.get_ticks()  # Réinitialiser le timer
+            
+            for piece in self.pieces[:]:
+                piece.update()
+                self.screen.blit(piece.image, piece.rect)
+                if self.player.rect.colliderect(piece.rect):  # Collision avec une pièce
+                    self.pieces.remove(piece)
+                    self.score += 1
                     
-                for heart in self.hearts[:]:
-                    heart.update()
-                    self.screen.blit(heart.image, heart.rect)
-                    if self.player.rect.colliderect(heart.rect):
-                        self.hearts.remove(heart)
-                        self.lives += 1
-                        
-                self.player.draw(self.screen)
-                self.enemy.draw(self.screen)
-                self.fall_death()
-                self.player.collide_with_walls(self.screen.get_width())
+                    
+            if  pygame.time.get_ticks() - self.last_heart_spawn_time > self.heart_spawn_interval:
+                x, y = Heart.generate_random_position(self.screen.get_width(), self.screen.get_height(), self.floor)
+                new_heart = Heart(x, y)
+                self.hearts.append(new_heart)
+                print(self.last_heart_spawn_time)
+                self.last_heart_spawn_time = pygame.time.get_ticks()
+                
+            for heart in self.hearts[:]:
+                heart.update()
+                self.screen.blit(heart.image, heart.rect)
+                if self.player.rect.colliderect(heart.rect):
+                    self.hearts.remove(heart)
+                    self.lives += 1
+                    
+            self.player.draw(self.screen)
+            self.enemy.draw(self.screen)
+            self.fall_death()
+            self.player.collide_with_walls(self.screen.get_width())
 
-                for enemy in self.enemies:
-                    enemy.draw(self.screen)  # Dessiner l'ennemi
-                    enemy.move_randomly()    # Déplacer l'ennemi de manière aléatoire (si tu veux ce comportement)
+            for enemy in self.enemies:
+                enemy.draw(self.screen)  # Dessiner l'ennemi
+                enemy.move_randomly()    # Déplacer l'ennemi de manière aléatoire (si tu veux ce comportement)
 
-                # Afficher l'image de l'ennemi
-                self.check_collision()
-                self.update_immortality()
-                if self.immortality:
-                    self.lose_lives()  # Faire clignoter le joueur
+            # Afficher l'image de l'ennemi
+            self.check_collision()
+            self.update_immortality()
+            if self.immortality:
+                self.lose_lives()  # Faire clignoter le joueur
+            else:
+                self.screen.blit(self.player.image, self.player.rect)
+            # Mettre à jour l'affichage
+            font = pygame.font.Font(None, 70)
+            # Texte en noir (contour)
+            outline_text = font.render(f"Score: {self.score}", True, (0, 0, 0))
+            for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # 4 directions autour du texte principal
+                self.screen.blit(outline_text, (720 + offset[0], 10 + offset[1]))
+
+            # Texte principal (couleur verte)
+            score_text = font.render(f"Score: {self.score}", True, (100, 255, 0))
+
+            self.screen.blit(score_text, (720 , 10))
+
+            self.draw_lives()
+            pygame.display.flip()
+
+            # Gérer les événements
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    print("Fermeture du jeu")
+                    self.started = False
+                    pygame.quit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE or event.key == pygame.K_UP:  # Saut
+                        self.player.jump()
+                    if event.key == pygame.K_LSHIFT:  # Dash
+                        self.player.dash()
+
+            # Gérer les touches maintenues
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_q] or keys[pygame.K_LEFT]:  # Déplacement vers la gauche
+                self.player.move_left()
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # Déplacement vers la droite
+                self.player.move_right()
+            if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+                self.player.move_down()
+            # keys = pygame.key.get_pressed()
+            # self.player.update_speed(keys)
+
+            current_time = pygame.time.get_ticks()  # Temps actuel
+
+
+                    
+        
+            
+            
+
+            # Afficher et gérer les pièces
+
+            #ajouter des enemy
+            if self.score % 5 == 0 and (self.score // 5) >= len(self.enemies):
+                # faire apparaitre l'enemy a l'oposer de player
+                if self.player.rect.x < SCREEN_WIDTH / 2:
+                    x = 1400
+                    y = 400
                 else:
-                    self.screen.blit(self.player.image, self.player.rect)
-                # Mettre à jour l'affichage
-                font = pygame.font.Font(None, 70)
-                # Texte en noir (contour)
-                outline_text = font.render(f"Score: {self.score}", True, (0, 0, 0))
-                for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # 4 directions autour du texte principal
-                    self.screen.blit(outline_text, (720 + offset[0], 10 + offset[1]))
+                    x = 50
+                    y = 400
 
-                # Texte principal (couleur verte)
-                score_text = font.render(f"Score: {self.score}", True, (100, 255, 0))
-
-                self.screen.blit(score_text, (720 , 10))
-
-                self.draw_lives()
-                pygame.display.flip()
-
-                # Gérer les événements
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        print("Fermeture du jeu")
-                        self.started = False
-                        pygame.quit()
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_SPACE or event.key == pygame.K_UP:  # Saut
-                            self.player.jump()
-                        if event.key == pygame.K_LSHIFT:  # Dash
-                            self.player.dash()
-
-                # Gérer les touches maintenues
-                keys = pygame.key.get_pressed()
-                if keys[pygame.K_q] or keys[pygame.K_LEFT]:  # Déplacement vers la gauche
-                    self.player.move_left()
-                if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # Déplacement vers la droite
-                    self.player.move_right()
-                if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-                    self.player.move_down()
-                # keys = pygame.key.get_pressed()
-                # self.player.update_speed(keys)
-
-                current_time = pygame.time.get_ticks()  # Temps actuel
-
-
-                        
-            
                 
                 
-
-                # Afficher et gérer les pièces
-
-                #ajouter des enemy
-                if self.score % 5 == 0 and (self.score // 5) >= len(self.enemies):
-                    # faire apparaitre l'enemy a l'oposer de player
-                    if self.player.rect.x < SCREEN_WIDTH / 2:
-                        x = 1400
-                        y = 400
-                    else:
-                        x = 50
-                        y = 400
-
-                    
-                    
-                    # Vérifie que l'ennemi n'apparaît pas sur le joueur
-                    if not self.player.rect.colliderect(pygame.Rect(x, y, 50, 50)):
-                        new_enemy = Enemy(x, y)
-                        self.enemies.append(new_enemy)
-                    
-                    
-                self.clock.tick(60)
+                # Vérifie que l'ennemi n'apparaît pas sur le joueur
+                if not self.player.rect.colliderect(pygame.Rect(x, y, 50, 50)):
+                    new_enemy = Enemy(x, y)
+                    self.enemies.append(new_enemy)
+                
+                
+            self.clock.tick(60)
 
