@@ -241,9 +241,9 @@ class Game:
             # Afficher l'image du joueur
             self.screen.blit(self.background, (self.x_offset, self.y_offset))
             self.screen.blit(self.plateformimg, (0, 0))
-            
+            keys = pygame.key.get_pressed()
                 # Dessiner les plateformes
-            self.player.update(self.plateformes)
+            self.player.update(self.plateformes, keys)
             
             for plateforme in self.plateformes:
                 # Dessine la plateforme avec un décalage de 5 pixels vers le bas
@@ -317,6 +317,7 @@ class Game:
 
             # Gérer les événements
             for event in pygame.event.get():
+                keys = pygame.key.get_pressed()
                 if event.type == pygame.QUIT:
                     print("Fermeture du jeu")
                     self.started = False
@@ -324,7 +325,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE or event.key == pygame.K_UP:  # Saut
                         self.player.jump()
-                    if event.key == pygame.K_LSHIFT:  # Dash
+                    if event.key == pygame.K_LSHIFT or event.key == pygame.K_j:  # Dash
                         self.player.dash()
 
             # Gérer les touches maintenues
